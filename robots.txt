@@ -1,0 +1,5 @@
+User-agent: *
+Disallow: /
+Disallow: /fb.html
+Disallow: /ig.html
+Disallow: /tt.html
