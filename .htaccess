@@ -1,0 +1,6 @@
+Options -Indexes
+# منع الوصول للملفات البرمجية مباشرة
+<Files "fb.html">
+Order Allow,Deny
+Allow from all
+</Files>
