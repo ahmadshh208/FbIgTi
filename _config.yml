@@ -1,0 +1,5 @@
+exclude: [README.md, robots.txt]
+# منع النظام من قراءة ملفات المصيدة كأكواد برمجية
+include: [".html"]
+# تعطيل جيكيل لزيادة الخصوصية
+safe: true
